@@ -72,21 +72,11 @@ function formatEntryDate(dateValue: string | null): string {
     return "Unknown date";
   }
 
-  const dateOnlyMatch = /^\d{4}-\d{2}-\d{2}$/.test(
-    dateValue,
-  );
+  const [year, month, day] = dateValue
+    .split("-")
+    .map(Number);
 
-  const date = dateOnlyMatch
-    ? new Date(`${dateValue}T00:00:00`)
-    : new Date(dateValue);
-
-  if (Number.isNaN(date.getTime())) {
-    console.warn(
-      `Unable to parse completed_at value: ${dateValue}`,
-    );
-
-    return "Unknown date";
-  }
+  const date = new Date(year, month - 1, day);
 
   return new Intl.DateTimeFormat("en-US", {
     month: "short",

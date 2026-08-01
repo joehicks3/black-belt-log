@@ -30,14 +30,22 @@ type ExerciseEntry = {
 
 const PAGE_SIZE = 25;
 
-function formatEntryDate(date: string) {
+function formatEntryDate(dateValue: string | null): string {
+  if (!dateValue) {
+    return "Unknown date";
+  }
+
+  const [year, month, day] = dateValue
+    .split("-")
+    .map(Number);
+
+  const date = new Date(year, month - 1, day);
+
   return new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/New_York",
-    weekday: "short",
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(new Date(date));
+  }).format(date);
 }
 
 function getPageNumber(value: string | undefined) {
