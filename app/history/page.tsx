@@ -26,6 +26,7 @@ type ExerciseEntry = {
   exercise_id: string;
   quantity: number;
   completed_at: string;
+  notes: string;
 };
 
 const PAGE_SIZE = 25;
@@ -138,7 +139,7 @@ export default async function HistoryPage({
 
   let entriesQuery = supabase
     .from("exercise_entries")
-    .select("id, exercise_id, quantity, completed_at", {
+    .select("id, exercise_id, quantity, completed_at, notes", {
       count: "exact",
     })
     .eq("user_id", user.id)
@@ -374,6 +375,8 @@ export default async function HistoryPage({
                       <p className="mt-1 text-sm text-zinc-400">
                         {formatEntryDate(entry.completed_at)}
                       </p>
+
+                      {entry.notes && <p className="mt-1 text-sm text-zinc-400">{entry.notes}</p>}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4">

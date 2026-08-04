@@ -39,6 +39,7 @@ type ExerciseEntry = {
   quantity: number;
   completed_at: string;
   created_at: string;
+  notes: string;
 };
 
 function getStartOfDay(date: Date): Date {
@@ -86,17 +87,12 @@ function formatEntryDate(dateValue: string | null): string {
 }
 
 function getTodayInputValue(): string {
-  const today = new Date();
-
-  const year = today.getFullYear();
-  const month = String(
-    today.getMonth() + 1,
-  ).padStart(2, "0");
-  const day = String(
-    today.getDate(),
-  ).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 }
 
 export default async function Home({
@@ -159,6 +155,7 @@ export default async function Home({
       .from("exercise_entries")
       .select(`
         id,
+        notes,
         exercise_id,
         quantity,
         completed_at,
@@ -471,82 +468,94 @@ export default async function Home({
               available.
             </p>
           ) : (
-        <form
-          action={addExerciseEntry}
-          className="grid gap-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)_auto] md:items-end"
-        >
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-zinc-300">
-              Exercise or skill
-            </span>
-
-            <select
-              name="exercise_id"
-              required
-              defaultValue=""
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-100 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-            >
-              <option value="" disabled>
-                Select an exercise
-              </option>
-
-              {sortedExercises.map((exercise) => {
-                const categoryName =
-                  categoryById.get(
-                    exercise.category_id,
-                  )?.name;
-
-                return (
-                  <option
-                    key={exercise.id}
-                    value={exercise.id}
-                  >
-                    {categoryName
-                      ? `${categoryName} — ${exercise.name}`
-                      : exercise.name}
-                  </option>
-                );
-              })}
-            </select>
-          </label>
-
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-zinc-300">
-              Quantity
-            </span>
-
-            <input
-              type="number"
-              name="quantity"
-              min="1"
-              step="1"
-              required
-              placeholder="0"
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-            />
-          </label>
-
-          <label className="block">
-            <span className="mb-2 block text-sm font-medium text-zinc-300">
-              Date completed
-            </span>
-
-            <input
-              type="date"
-              name="completed_at"
-              required
-              defaultValue={getTodayInputValue()}
-              className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-100 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
-            />
-          </label>
-
-          <button
-            type="submit"
-            className="rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-zinc-900"
+            <form
+            action={addExerciseEntry}
+            className="grid gap-4"
           >
-            Add entry
-          </button>
-        </form>
+            <div className="grid gap-4 md:grid-cols-[minmax(0,2fr)_minmax(120px,0.7fr)_minmax(180px,1fr)]">
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-zinc-300">
+                  Exercise or skill
+                </span>
+          
+                <select
+                  name="exercise_id"
+                  required
+                  defaultValue=""
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-100 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                >
+                  <option value="" disabled>
+                    Select an exercise
+                  </option>
+          
+                  {sortedExercises.map((exercise) => {
+                    const categoryName =
+                      categoryById.get(exercise.category_id)?.name;
+          
+                    return (
+                      <option key={exercise.id} value={exercise.id}>
+                        {categoryName
+                          ? `${categoryName} — ${exercise.name}`
+                          : exercise.name}
+                      </option>
+                    );
+                  })}
+                </select>
+              </label>
+          
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-zinc-300">
+                  Quantity
+                </span>
+          
+                <input
+                  type="number"
+                  name="quantity"
+                  min="1"
+                  step="1"
+                  required
+                  placeholder="0"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                />
+              </label>
+          
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-zinc-300">
+                  Date completed
+                </span>
+          
+                <input
+                  type="date"
+                  name="completed_at"
+                  required
+                  defaultValue={getTodayInputValue()}
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-100 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                />
+              </label>
+            </div>
+          
+            <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_180px] md:items-end">
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-zinc-300">
+                  Notes
+                </span>
+          
+                <input
+                  type="text"
+                  name="notes"
+                  placeholder="Optional notes"
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                />
+              </label>
+          
+              <button
+                type="submit"
+                className="rounded-lg bg-emerald-500 px-5 py-2.5 text-sm font-bold text-zinc-950 transition hover:bg-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-zinc-900"
+              >
+                Add entry
+              </button>
+            </div>
+          </form>
           )}
         </section>
 
@@ -636,6 +645,9 @@ export default async function Home({
                           {formatEntryDate(
                             entry.completed_at,
                           )}
+                        </p>
+                        <p className="mt-1 text-sm text-zinc-400">
+                          {entry.notes}
                         </p>
                       </div>
 

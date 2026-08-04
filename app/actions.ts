@@ -28,6 +28,7 @@ type ParsedEntryFormData =
       exerciseId: string;
       quantity: number;
       completedAt: string;
+      notes: string;
     }
   | {
       success: false;
@@ -37,6 +38,13 @@ type ParsedEntryFormData =
 function parseEntryFormData(
   formData: FormData,
 ): ParsedEntryFormData {
+  console.log({
+    exercise_id: formData.get("exercise_id"),
+    quantity: formData.get("quantity"),
+    completed_at: formData.get("completed_at"),
+    notes: formData.get("notes"),
+  });
+
   const exerciseIdValue =
     formData.get("exercise_id");
 
@@ -45,6 +53,9 @@ function parseEntryFormData(
 
   const completedAtValue =
     formData.get("completed_at");
+
+  const notesValue =
+    formData.get("notes");
 
   if (
     typeof exerciseIdValue !== "string" ||
@@ -74,11 +85,19 @@ function parseEntryFormData(
     };
   }
 
+  if (typeof notesValue !== "string") {
+    return {
+      success: false,
+      error: "Notes must be a string",
+    };
+  }
+
   return {
     success: true,
     exerciseId: exerciseIdValue,
     quantity,
     completedAt: completedAtValue,
+    notes: notesValue,
   };
 }
 
@@ -95,6 +114,7 @@ export async function addExerciseEntry(formData: FormData) {
     exercise_id: parsed.exerciseId,
     quantity: parsed.quantity,
     completed_at: parsed.completedAt,
+    notes: parsed.notes,
     user_id: user.id,
   });
 
@@ -136,6 +156,7 @@ export async function updateExerciseEntry(formData: FormData) {
       exercise_id: parsed.exerciseId,
       quantity: parsed.quantity,
       completed_at: parsed.completedAt,
+      notes: parsed.notes,
     })
     .eq("id", entryId)
     .eq("user_id", user.id);

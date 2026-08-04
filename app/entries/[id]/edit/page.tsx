@@ -26,6 +26,7 @@ type ExerciseEntry = {
   exercise_id: string;
   quantity: number;
   completed_at: string;
+  notes: string;
 };
 
 function formatDateForInput(value: string) {
@@ -60,7 +61,7 @@ export default async function EditEntryPage({
   ] = await Promise.all([
     supabase
       .from("exercise_entries")
-      .select("id, exercise_id, quantity, completed_at")
+      .select("id, exercise_id, quantity, completed_at, notes")
       .eq("id", id)
       .eq("user_id", user.id)
       .maybeSingle(),
@@ -181,13 +182,27 @@ export default async function EditEntryPage({
               </label>
 
               <input
-                id="completed_date"
-                name="completed_date"
+                id="completed_at"
+                name="completed_at"
                 type="date"
                 required
                 defaultValue={formatDateForInput(entry.completed_at)}
                 className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               />
+            </div>
+            <div>
+              <label
+                htmlFor="notes"
+                className="block text-sm font-medium text-zinc-300"
+              >
+                Notes
+              </label>
+            <textarea
+              id="notes"
+              name="notes"
+              defaultValue={entry.notes}
+              className="mt-1 w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2.5 text-zinc-100 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+            />
             </div>
 
             <div className="flex gap-3">
