@@ -93,6 +93,34 @@ function buildHistoryUrl({
   return queryString ? `/history?${queryString}` : "/history";
 }
 
+function buildPrintHistoryUrl({
+  exercise,
+  start,
+  end,
+}: {
+  exercise?: string;
+  start?: string;
+  end?: string;
+}) {
+  const params = new URLSearchParams();
+
+  if (exercise) {
+    params.set("exercise", exercise);
+  }
+
+  if (start) {
+    params.set("start", start);
+  }
+
+  if (end) {
+    params.set("end", end);
+  }
+
+  const queryString = params.toString();
+
+  return queryString ? `/history/print?${queryString}` : "/history/print";
+}
+
 export default async function HistoryPage({
   searchParams,
 }: HistoryPageProps) {
@@ -330,7 +358,19 @@ export default async function HistoryPage({
               </p>
             </div>
 
-            <div className="text-right">
+            <div className="flex items-center gap-5">
+              <Link
+                href={buildPrintHistoryUrl({
+                  exercise: selectedExercise,
+                  start: startDate,
+                  end: endDate,
+                })}
+                className="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:bg-zinc-800"
+              >
+                Print all
+              </Link>
+
+              <div className="text-right">
               <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
                 Quantity on this page
               </p>
@@ -338,6 +378,7 @@ export default async function HistoryPage({
               <p className="mt-1 text-xl font-semibold text-emerald-400">
                 {quantityOnPage.toLocaleString()}
               </p>
+              </div>
             </div>
           </div>
 
